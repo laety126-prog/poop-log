@@ -18,7 +18,7 @@
             padding: 15px;
             display: flex;
             justify-content: center;
-            -webkit-tap-highlight-color: transparent; /* スマホのタップハイライトを無効化 */
+            -webkit-tap-highlight-color: transparent;
         }
         .app-container {
             background: white;
@@ -44,7 +44,7 @@
             align-items: center;
             gap: 5px;
         }
-        /* 日時設定エリア */
+        /* 【修正箇所】日時設定エリアの重なり防止 */
         .datetime-area {
             background: #fdf6ed;
             padding: 12px;
@@ -52,9 +52,11 @@
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap; /* 画面が狭いときは自動で縦に並ぶように */
         }
         .datetime-area div {
             flex: 1;
+            min-width: 120px; /* 必要最低限の幅を確保して重なりを防止 */
         }
         .datetime-area label {
             display: block;
@@ -67,9 +69,10 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem; /* 少しだけ文字を小さくして収まりを良く */
             background: white;
             box-sizing: border-box;
+            height: 40px; /* 高さを統一 */
         }
         /* 選択肢のボタンデザイン */
         .selector-grid {
@@ -87,7 +90,6 @@
             cursor: pointer;
             font-size: 0.85rem;
             user-select: none;
-            /* スマホでの誤作動防止 */
             touch-action: manipulation; 
         }
         .option-btn .emoji {
@@ -175,26 +177,18 @@
 </div>
 
 <script>
-    // 初期設定：画面を開いたときの日時をセット
     initDateTime();
-
-    // 選択ボタンのスマホ対応イベント設定
     setupSelector('hardnessGroup');
     setupSelector('amountGroup');
-
-    // 記録ボタンのクリックイベントを設定
     document.getElementById('submitBtn').addEventListener('click', saveRecord);
 
     function initDateTime() {
         const now = new Date();
-        
-        // 今日の日付をセット (YYYY-MM-DD)
         const yyyy = now.getFullYear();
         const mm = String(now.getMonth() + 1).padStart(2, '0');
         const dd = String(now.getDate()).padStart(2, '0');
         document.getElementById('logDate').value = `${yyyy}-${mm}-${dd}`;
         
-        // 24時間分の選択肢を生成して今の時間をセット
         const hourSelect = document.getElementById('logHour');
         const currentHour = now.getHours();
         
@@ -212,11 +206,10 @@
         const buttons = container.getElementsByClassName('option-btn');
         
         for (let btn of buttons) {
-            // スマホの「touchstart」とPCの「click」両方に対応させて確実に入力できるように修正
             const eventType = window.ontouchstart !== undefined ? 'touchstart' : 'click';
             
             btn.addEventListener(eventType, function(e) {
-                e.preventDefault(); // スマホのダブルタップズームなどの挙動を防ぐ
+                e.preventDefault();
                 for (let b of buttons) b.classList.remove('selected');
                 this.classList.add('selected');
             });
@@ -224,10 +217,9 @@
     }
 
     function saveRecord() {
-        // 選択された日付と時間を取得して結合
         const selectedDate = document.getElementById('logDate').value;
         const selectedHour = document.getElementById('logHour').value;
-        const timeStr = `${selectedDate} ${selectedHour}:00`; // 「2026-06-21 21:00」のような形式になります
+        const timeStr = `${selectedDate} ${selectedHour}:00`;
 
         const hardness = document.querySelector('#hardnessGroup .option-btn.selected').getAttribute('data-value');
         const amount = document.querySelector('#amountGroup .option-btn.selected').getAttribute('data-value');
