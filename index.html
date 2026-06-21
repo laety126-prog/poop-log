@@ -1,0 +1,31 @@
+function saveRecord() {
+        const now = new Date();
+        const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+        const hardness = document.querySelector('#hardnessGroup .option-btn.selected').getAttribute('data-value');
+        const amount = document.querySelector('#amountGroup .option-btn.selected').getAttribute('data-value');
+
+        // ★ここに手順3でコピーしたURLを貼り付けます
+        const gasUrl = "https://script.google.com/macros/s/AKfycbx5i0HrAA4teg6AoiHhhACbw6aFaeJ0OvnALXywv7g0rq6owxU4QWWexLeeyhVD7m_O/exec";
+
+        const data = { time: timeStr, hardness: hardness, amount: amount };
+
+        // スプレッドシートにデータを送信
+        fetch(gasUrl, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "text/plain" }
+        })
+        .then(response => response.json())
+        .then(result => {
+            if(result.status === "success") {
+                document.getElementById('msg').innerText = `SSに記録しました！ (${timeStr})`;
+            } else {
+                document.getElementById('msg').innerText = "エラーが発生しました";
+            }
+        })
+        .catch(error => {
+            document.getElementById('msg').innerText = "通信エラーが発生しました";
+            console.error(error);
+        });
+    }
