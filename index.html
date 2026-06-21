@@ -15,9 +15,10 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             justify-content: center;
+            -webkit-tap-highlight-color: transparent; /* スマホのタップハイライトを無効化 */
         }
         .app-container {
             background: white;
@@ -25,39 +26,72 @@
             width: 100%;
             border-radius: 20px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-            padding: 24px;
+            padding: 20px;
             box-sizing: border-box;
         }
         h1 {
             text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 24px;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
             color: #6d4c41;
         }
         .section-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: #555;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+        /* 日時設定エリア */
+        .datetime-area {
+            background: #fdf6ed;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .datetime-area div {
+            flex: 1;
+        }
+        .datetime-area label {
+            display: block;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+        .datetime-area input, .datetime-area select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            box-sizing: border-box;
+        }
+        /* 選択肢のボタンデザイン */
         .selector-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .option-btn {
             background: #f0f0f0;
             border: 2px solid transparent;
             border-radius: 12px;
-            padding: 12px 8px;
+            padding: 12px 4px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            user-select: none;
+            /* スマホでの誤作動防止 */
+            touch-action: manipulation; 
         }
         .option-btn .emoji {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             display: block;
             margin-bottom: 4px;
         }
@@ -66,8 +100,8 @@
             border-color: var(--primary-color);
             color: #e65100;
             font-weight: bold;
-            transform: scale(1.03);
         }
+        /* 記録ボタン */
         .submit-btn {
             width: 100%;
             background: var(--primary-color);
@@ -75,15 +109,11 @@
             border: none;
             border-radius: 15px;
             padding: 16px;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255, 159, 67, 0.3);
-            transition: all 0.2s;
-        }
-        .submit-btn:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 6px rgba(255, 159, 67, 0.3);
+            touch-action: manipulation;
         }
         .message {
             text-align: center;
@@ -92,6 +122,7 @@
             color: #2e7d32;
             line-height: 1.4;
             font-weight: bold;
+            min-height: 40px;
         }
     </style>
 </head>
@@ -99,6 +130,18 @@
 
 <div class="app-container">
     <h1>👶 うんちきろく</h1>
+
+    <div class="section-title">📅 いつした？</div>
+    <div class="datetime-area">
+        <div>
+            <label>ひにち</label>
+            <input type="date" id="logDate">
+        </div>
+        <div>
+            <label>じかん</label>
+            <select id="logHour"></select>
+        </div>
+    </div>
 
     <div class="section-title">1. かたさは？</div>
     <div class="selector-grid" id="hardnessGroup">
@@ -126,13 +169,94 @@
         </div>
     </div>
 
-    <button class="submit-btn" onclick="saveRecord()">📝 記録する</button>
+    <button class="submit-btn" id="submitBtn">📝 記録する</button>
     
     <div class="message" id="msg"></div>
 </div>
 
 <script>
+    // 初期設定：画面を開いたときの日時をセット
+    initDateTime();
+
+    // 選択ボタンのスマホ対応イベント設定
     setupSelector('hardnessGroup');
     setupSelector('amountGroup');
 
-    function setupSelector(groupId)
+    // 記録ボタンのクリックイベントを設定
+    document.getElementById('submitBtn').addEventListener('click', saveRecord);
+
+    function initDateTime() {
+        const now = new Date();
+        
+        // 今日の日付をセット (YYYY-MM-DD)
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        document.getElementById('logDate').value = `${yyyy}-${mm}-${dd}`;
+        
+        // 24時間分の選択肢を生成して今の時間をセット
+        const hourSelect = document.getElementById('logHour');
+        const currentHour = now.getHours();
+        
+        for (let i = 0; i < 24; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `${i}時`;
+            if (i === currentHour) opt.selected = true;
+            hourSelect.appendChild(opt);
+        }
+    }
+
+    function setupSelector(groupId) {
+        const container = document.getElementById(groupId);
+        const buttons = container.getElementsByClassName('option-btn');
+        
+        for (let btn of buttons) {
+            // スマホの「touchstart」とPCの「click」両方に対応させて確実に入力できるように修正
+            const eventType = window.ontouchstart !== undefined ? 'touchstart' : 'click';
+            
+            btn.addEventListener(eventType, function(e) {
+                e.preventDefault(); // スマホのダブルタップズームなどの挙動を防ぐ
+                for (let b of buttons) b.classList.remove('selected');
+                this.classList.add('selected');
+            });
+        }
+    }
+
+    function saveRecord() {
+        // 選択された日付と時間を取得して結合
+        const selectedDate = document.getElementById('logDate').value;
+        const selectedHour = document.getElementById('logHour').value;
+        const timeStr = `${selectedDate} ${selectedHour}:00`; // 「2026-06-21 21:00」のような形式になります
+
+        const hardness = document.querySelector('#hardnessGroup .option-btn.selected').getAttribute('data-value');
+        const amount = document.querySelector('#amountGroup .option-btn.selected').getAttribute('data-value');
+
+        const gasUrl = "https://script.google.com/macros/s/AKfycbx5i0HrAA4teg6AoiHhhACbw6aFaeJ0OvnALXywv7g0rq6owxU4QWWexLeeyhVD7m_O/exec";
+
+        const data = { time: timeStr, hardness: hardness, amount: amount };
+
+        document.getElementById('msg').innerText = "送信中...";
+
+        fetch(gasUrl, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "text/plain" }
+        })
+        .then(response => response.json())
+        .then(result => {
+            if(result.status === "success") {
+                document.getElementById('msg').innerHTML = "いつもお疲れさまです！<br>記録ありがとうございます(*^-^*)";
+            } else {
+                document.getElementById('msg').innerText = "エラーが発生しました";
+            }
+        })
+        .catch(error => {
+            document.getElementById('msg').innerText = "通信エラーが発生しました";
+            console.error(error);
+        });
+    }
+</script>
+
+</body>
+</html>
