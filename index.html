@@ -88,9 +88,9 @@
         .message {
             text-align: center;
             margin-top: 15px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #2e7d32;
-            height: 20px;
+            line-height: 1.4;
             font-weight: bold;
         }
     </style>
@@ -132,57 +132,7 @@
 </div>
 
 <script>
-    // 選択状態を管理するスクリプト
     setupSelector('hardnessGroup');
     setupSelector('amountGroup');
 
-    function setupSelector(groupId) {
-        const container = document.getElementById(groupId);
-        const buttons = container.getElementsByClassName('option-btn');
-        
-        for (let btn of buttons) {
-            btn.addEventListener('click', function() {
-                for (let b of buttons) b.classList.remove('selected');
-                this.classList.add('selected');
-            });
-        }
-    }
-
-    // 記録ボタンを押したときの処理（スプレッドシート連携版）
-    function saveRecord() {
-        const now = new Date();
-        const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-
-        const hardness = document.querySelector('#hardnessGroup .option-btn.selected').getAttribute('data-value');
-        const amount = document.querySelector('#amountGroup .option-btn.selected').getAttribute('data-value');
-
-        // 先ほど教えていただいたURLをあらかじめ設定しています
-        const gasUrl = "https://script.google.com/macros/s/AKfycbx5i0HrAA4teg6AoiHhhACbw6aFaeJ0OvnALXywv7g0rq6owxU4QWWexLeeyhVD7m_O/exec";
-
-        const data = { time: timeStr, hardness: hardness, amount: amount };
-
-        document.getElementById('msg').innerText = "送信中...";
-
-        // スプレッドシートにデータを送信
-        fetch(gasUrl, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "text/plain" }
-        })
-        .then(response => response.json())
-        .then(result => {
-            if(result.status === "success") {
-                document.getElementById('msg').innerText = `SSに記録しました！ (${timeStr})`;
-            } else {
-                document.getElementById('msg').innerText = "エラーが発生しました";
-            }
-        })
-        .catch(error => {
-            document.getElementById('msg').innerText = "通信エラーが発生しました";
-            console.error(error);
-        });
-    }
-</script>
-
-</body>
-</html>
+    function setupSelector(groupId)
