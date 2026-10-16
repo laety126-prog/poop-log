@@ -55,18 +55,22 @@ function buildNote() {
   let note = ss.getSheetByName(NOTE);
   if (!note) { note = ss.insertSheet(NOTE, 0); }
 
-  // 開始日（月曜）。B1が空なら「先週の月曜」
-  let start = note.getRange('B1').getValue();
-  if (!(start instanceof Date)) { start = new Date(); start.setDate(start.getDate() - 7); }
-  start = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  // 開始日（月曜）。B1のプルダウンで選んだ週。空なら「先週の月曜」
+  const picked = note.getRange('B1').getValue();
+  let start = null;
+  if (picked instanceof Date) start = picked;
+  else { const m = String(picked).match(/(\d{4})\D(\d{1,2})\D(\d{1,2})/); if (m) start = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])); }
+  if (!start) { start = new Date(); start.setDate(start.getDate() - 7); }
+  start = monday_(start);
 
   // 記録を日付×時間にまとめる
   const cells = {}, notes = {};
   const rows = recSheet_().getDataRange().getValues().slice(1);
+  let earliest = null;
   for (const r of rows) {
     const d = dateKey_(r[1] || r[0]);
     if (!d) continue;
+    if (!earliest || d < earliest) earliest = d;
     const h = Number(r[2]) || 0;
     const codes = String(r[5] || '').split(',').map(s => s.trim()).filter(Boolean);
     const text = `${r[3] || ''}\n${CIRCLE[Number(r[4])] || ''}${codes.length ? ' ' + codes.join(' ') : ''}`;
@@ -94,11 +98,21 @@ function buildNote() {
   // 書き込みと見た目
   const width = NOTE_COL;
   if (note.getMaxColumns() < width + 2) note.insertColumnsAfter(note.getMaxColumns(), width + 2 - note.getMaxColumns());
+  note.getRange(1, 2, 1, width).breakApart();
+  note.getRange('C1').clearContent();
   note.getRange(2, 1, 40, width + 2).clear();
-  note.getRange('A1').setValue('開始日（月曜）');
-  note.getRange('B1').setValue(start).setNumberFormat('yyyy/mm/dd').setBackground('#fff7d6').setFontWeight('bold');
-  note.getRange('C1').setValue('← 日付を変えると、その週から2週間分に切りかわります（ノート1ページ分）');
-  note.getRange('A1:C1').setFontSize(10);
+  // 週を選ぶプルダウン（新しい週が上）
+  const now = monday_(new Date());
+  let first = earliest ? monday_(new Date(Number(earliest.slice(0, 4)), Number(earliest.slice(5, 7)) - 1, Number(earliest.slice(8, 10)))) : new Date(now);
+  if (first > start) first = new Date(start);
+  const labels = [];
+  for (let w = new Date(now.getFullYear(), now.getMonth(), now.getDate()); w >= first && labels.length < 400; w.setDate(w.getDate() - 7)) labels.push(weekLabel_(w));
+  const current = weekLabel_(start);
+  if (labels.indexOf(current) < 0) labels.push(current);
+  const rule = SpreadsheetApp.newDataValidation().requireValueInList(labels, true).setAllowInvalid(false).build();
+  note.getRange('A1').setValue('表示する週');
+  note.getRange('B1').setDataValidation(rule).setNumberFormat('@').setValue(current).setBackground('#fff7d6').setFontWeight('bold').setHorizontalAlignment('left');
+  note.getRange('A1:B1').setFontSize(11);
 
   const all = note.getRange(2, 1, values.length, width);
   all.setValues(values)
@@ -116,14 +130,25 @@ function buildNote() {
     if (wd === '土') note.getRange(3 + i, 2).setFontColor('#1f6fd1').setFontWeight('bold');
     if (wd === '日') note.getRange(3 + i, 2).setFontColor('#d1342b').setFontWeight('bold');
   }
-  note.setColumnWidth(1, 56); note.setColumnWidth(2, 32);
+  note.setColumnWidth(1, 76); note.setColumnWidth(2, 32);
+  note.getRange('B1:Z1').merge();
   note.setColumnWidths(FIRST_HOUR_COL, HOURS, 36);
   note.setColumnWidth(NOTE_COL, 280);
   note.setRowHeights(3, DAYS, 46);
   note.setFrozenRows(2); note.setFrozenColumns(2);
 }
 
-/* B1（開始日）を変えたら作り直す */
+function monday_(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+}
+function weekLabel_(mon) {
+  const end = new Date(mon); end.setDate(mon.getDate() + 13);
+  return `${mon.getFullYear()}/${mon.getMonth() + 1}/${mon.getDate()}（月）〜${end.getMonth() + 1}/${end.getDate()}（日）の2週間`;
+}
+
+/* B1（表示する週）を選んだら作り直す */
 function onEdit(e) {
   if (e && e.range.getSheet().getName() === NOTE && e.range.getA1Notation() === 'B1') buildNote();
 }
