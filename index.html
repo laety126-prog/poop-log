@@ -108,6 +108,15 @@
   .opt:active { transform: scale(.96); }
   .opt:focus-visible, .chip:focus-visible, .send:focus-visible, .edit-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
+
+  .grid.g4 { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .opt .big { font-size: 26px; font-weight: 900; line-height: 1; }
+  .grid.g4 .opt { font-size: 12.5px; padding: 12px 2px 10px; border-radius: 16px; }
+  .grid.g4 .opt .big { font-size: 24px; }
+  .opt-note { font-size: 12px; color: var(--muted); font-weight: 500; }
+  #symGroup { margin-top: 0; }
+  .memo { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .memo input { font: inherit; font-size: 16px; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; min-width: 0; }
   /* 最近の記録 */
   .recent h2 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 700; }
   .recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -153,7 +162,7 @@
       <div class="when-big" id="whenBig"></div>
       <button class="edit-toggle" type="button" id="editToggle" aria-expanded="false">日時を変える</button>
     </div>
-    <div class="chips" role="group" aria-label="かんたん選択">
+    <div class="chips" id="agoGroup" role="group" aria-label="かんたん選択">
       <button class="chip" type="button" data-ago="0" aria-pressed="true">いま</button>
       <button class="chip" type="button" data-ago="1" aria-pressed="false">1時間前</button>
       <button class="chip" type="button" data-ago="2" aria-pressed="false">2時間前</button>
@@ -165,22 +174,38 @@
     </div>
   </section>
 
-  <section class="card" aria-labelledby="qHard">
-    <p class="q" id="qHard"><span class="step">2</span>かたさは？</p>
-    <div class="grid" id="hardnessGroup" role="group" aria-labelledby="qHard">
-      <button class="opt" type="button" data-value="かたい" aria-pressed="false"><span class="ico" aria-hidden="true">🪨</span>かたい</button>
-      <button class="opt" type="button" data-value="ふつう" aria-pressed="true"><span class="ico" aria-hidden="true">🍌</span>ふつう</button>
-      <button class="opt" type="button" data-value="やわらかい" aria-pressed="false"><span class="ico" aria-hidden="true">💧</span>ゆるめ</button>
+  <section class="card" aria-labelledby="qAmt">
+    <p class="q" id="qAmt"><span class="step">2</span>量は？</p>
+    <div class="grid" id="amountGroup" role="group" aria-labelledby="qAmt">
+      <button class="opt" type="button" data-value="S" aria-pressed="false"><span class="big">S</span>すくない</button>
+      <button class="opt" type="button" data-value="M" aria-pressed="true"><span class="big">M</span>ふつう</button>
+      <button class="opt" type="button" data-value="L" aria-pressed="false"><span class="big">L</span>おおい</button>
     </div>
   </section>
 
-  <section class="card" aria-labelledby="qAmt">
-    <p class="q" id="qAmt"><span class="step">3</span>量は？</p>
-    <div class="grid" id="amountGroup" role="group" aria-labelledby="qAmt">
-      <button class="opt" type="button" data-value="すくない" aria-pressed="false"><span class="ico" aria-hidden="true">🫘</span>すくない</button>
-      <button class="opt" type="button" data-value="ふつう" aria-pressed="true"><span class="ico" aria-hidden="true">👍</span>ふつう</button>
-      <button class="opt" type="button" data-value="おおい" aria-pressed="false"><span class="ico" aria-hidden="true">💥</span>おおい</button>
+  <section class="card" aria-labelledby="qHard">
+    <p class="q" id="qHard"><span class="step">3</span>かたさは？</p>
+    <div class="grid g4" id="hardnessGroup" role="group" aria-labelledby="qHard">
+      <button class="opt" type="button" data-value="1" aria-pressed="false"><span class="big">①</span>コロコロ</button>
+      <button class="opt" type="button" data-value="2" aria-pressed="false"><span class="big">②</span>かたい</button>
+      <button class="opt" type="button" data-value="3" aria-pressed="false"><span class="big">③</span>ややかたい</button>
+      <button class="opt" type="button" data-value="4" aria-pressed="true"><span class="big">④</span>ふつう</button>
+      <button class="opt" type="button" data-value="5" aria-pressed="false"><span class="big">⑤</span>やわらかい</button>
+      <button class="opt" type="button" data-value="6" aria-pressed="false"><span class="big">⑥</span>泥状</button>
+      <button class="opt" type="button" data-value="7" aria-pressed="false"><span class="big">⑦</span>水様</button>
     </div>
+  </section>
+
+  <section class="card" aria-labelledby="qSym">
+    <p class="q" id="qSym"><span class="step">4</span>あてはまるもの<span class="opt-note">（あれば・いくつでも）</span></p>
+    <div class="chips" id="symGroup" role="group" aria-labelledby="qSym">
+      <button class="chip" type="button" data-value="E" aria-pressed="false">E もれた</button>
+      <button class="chip" type="button" data-value="B" aria-pressed="false">B 血がついた</button>
+      <button class="chip" type="button" data-value="P" aria-pressed="false">P 痛がった</button>
+      <button class="chip" type="button" data-value="浣" aria-pressed="false">浣腸</button>
+      <button class="chip" type="button" data-value="座" aria-pressed="false">座薬</button>
+    </div>
+    <label class="memo" for="memo">メモ（気づいたこと）<input id="memo" type="text" maxlength="60" placeholder="例：機嫌よし"></label>
   </section>
 
   <section class="card recent" aria-labelledby="recentTitle">
@@ -199,7 +224,10 @@
 
 <script>
   const GAS_URL = "https://script.google.com/macros/s/AKfycbx5i0HrAA4teg6AoiHhhACbw6aFaeJ0OvnALXywv7g0rq6owxU4QWWexLeeyhVD7m_O/exec";
-  const LABEL = { "かたい": "かたい", "ふつう": "ふつう", "やわらかい": "ゆるめ", "すくない": "すくない", "おおい": "おおい" };
+  const CIRCLE = ["", "①", "②", "③", "④", "⑤", "⑥", "⑦"];
+  const HARD = ["", "コロコロ", "かたい", "ややかたい", "ふつう", "やわらかい", "泥状", "水様"];
+  const SYM = { E: "もれた", B: "血", P: "痛", "浣": "浣腸", "座": "座薬" };
+  const fmtRec = r => `${r.amount || ""}${CIRCLE[Number(r.hardness)] || r.hardness || ""}${(r.symptoms || []).length ? " " + r.symptoms.join(" ") : ""}`;
   const WD = ["日", "月", "火", "水", "木", "金", "土"];
   const $ = id => document.getElementById(id);
   const pad = n => String(n).padStart(2, "0");
@@ -229,10 +257,14 @@
   }
   function selected(groupId) {
     const b = document.querySelector(`#${groupId} .opt[aria-pressed="true"]`);
-    return b ? b.dataset.value : "ふつう";
+    return b ? b.dataset.value : (groupId === "amountGroup" ? "M" : "4");
   }
   function renderSummary() {
-    $("summary").textContent = `${$("whenBig").textContent.replace("ごろ", "ごろ・")}／${LABEL[selected("hardnessGroup")]}／${LABEL[selected("amountGroup")]}`;
+    const sym = symptoms();
+    $("summary").textContent = `${$("whenBig").textContent.replace("ごろ", "ごろ・")}／${selected("amountGroup")}${CIRCLE[selected("hardnessGroup")]} ${HARD[selected("hardnessGroup")]}${sym.length ? "／" + sym.map(s => SYM[s]).join("・") : ""}`;
+  }
+  function symptoms() {
+    return [...document.querySelectorAll('#symGroup .chip[aria-pressed="true"]')].map(b => b.dataset.value);
   }
   function renderRecent() {
     const list = store.get();
@@ -241,7 +273,7 @@
     for (const r of list) {
       const li = document.createElement("li");
       const t = document.createElement("span"); t.className = "t"; t.textContent = r.time.slice(5).replace("-", "/");
-      const v = document.createElement("span"); v.className = "v"; v.textContent = `${LABEL[r.hardness] || r.hardness}・${LABEL[r.amount] || r.amount}`;
+      const v = document.createElement("span"); v.className = "v"; v.textContent = fmtRec(r);
       li.append(t, v); ul.append(li);
     }
   }
@@ -252,8 +284,8 @@
     for (let i = 0; i < 24; i++) { const o = document.createElement("option"); o.value = String(i); o.textContent = `${i}時`; $("logHour").append(o); }
     setWhen(now);
 
-    document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
-      document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", "false"));
+    document.querySelectorAll("#agoGroup .chip").forEach(c => c.addEventListener("click", () => {
+      document.querySelectorAll("#agoGroup .chip").forEach(x => x.setAttribute("aria-pressed", "false"));
       c.setAttribute("aria-pressed", "true");
       const d = new Date(); d.setHours(d.getHours() - Number(c.dataset.ago)); setWhen(d);
     }));
@@ -263,7 +295,7 @@
       $("editToggle").textContent = open ? "とじる" : "日時を変える";
     });
     ["logDate", "logHour"].forEach(id => $(id).addEventListener("change", () => {
-      document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", "false"));
+      document.querySelectorAll("#agoGroup .chip").forEach(x => x.setAttribute("aria-pressed", "false"));
       renderWhen();
     }));
     ["hardnessGroup", "amountGroup"].forEach(g => {
@@ -273,6 +305,10 @@
         renderSummary();
       }));
     });
+    document.querySelectorAll("#symGroup .chip").forEach(b => b.addEventListener("click", () => {
+      b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+      renderSummary();
+    }));
     $("submitBtn").addEventListener("click", saveRecord);
     renderRecent();
   }
@@ -285,13 +321,18 @@
     if (sending) return;
     sending = true;
     const btn = $("submitBtn");
-    const data = { time: `${$("logDate").value} ${$("logHour").value}:00`, hardness: selected("hardnessGroup"), amount: selected("amountGroup") };
+    const data = {
+      time: `${$("logDate").value} ${$("logHour").value}:00`, date: $("logDate").value, hour: Number($("logHour").value),
+      amount: selected("amountGroup"), hardness: Number(selected("hardnessGroup")), symptoms: symptoms(), memo: $("memo").value.trim()
+    };
     btn.disabled = true; btn.textContent = "送信中…";
     fetch(GAS_URL, { method: "POST", body: JSON.stringify(data), headers: { "Content-Type": "text/plain" } })
       .then(r => r.json())
       .then(res => {
         if (res.status === "success") {
           store.set([data, ...store.get()]); renderRecent();
+          document.querySelectorAll("#symGroup .chip").forEach(b => b.setAttribute("aria-pressed", "false"));
+          $("memo").value = ""; renderSummary();
           btn.classList.add("done"); btn.textContent = "記録しました！おつかれさま";
           resetButton(btn, 2200);
         } else {
