@@ -1,254 +1,311 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>うんちきろく</title>
-    <style>
-        :root {
-            --primary-color: #ff9f43;
-            --bg-color: #f8f9fa;
-            --text-color: #333;
-        }
-        body {
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .app-container {
-            background: white;
-            max-width: 400px;
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        h1 {
-            text-align: center;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            color: #6d4c41;
-        }
-        .section-title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        /* 【修正箇所】日時設定エリアの重なり防止 */
-        .datetime-area {
-            background: #fdf6ed;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap; /* 画面が狭いときは自動で縦に並ぶように */
-        }
-        .datetime-area div {
-            flex: 1;
-            min-width: 120px; /* 必要最低限の幅を確保して重なりを防止 */
-        }
-        .datetime-area label {
-            display: block;
-            font-size: 0.75rem;
-            color: #7f8c8d;
-            margin-bottom: 4px;
-        }
-        .datetime-area input, .datetime-area select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 0.9rem; /* 少しだけ文字を小さくして収まりを良く */
-            background: white;
-            box-sizing: border-box;
-            height: 40px; /* 高さを統一 */
-        }
-        /* 選択肢のボタンデザイン */
-        .selector-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .option-btn {
-            background: #f0f0f0;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            padding: 12px 4px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            user-select: none;
-            touch-action: manipulation; 
-        }
-        .option-btn .emoji {
-            font-size: 1.3rem;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .option-btn.selected {
-            background-color: #fff3e0;
-            border-color: var(--primary-color);
-            color: #e65100;
-            font-weight: bold;
-        }
-        /* 記録ボタン */
-        .submit-btn {
-            width: 100%;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            padding: 16px;
-            font-size: 1.15rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 159, 67, 0.3);
-            touch-action: manipulation;
-        }
-        .message {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.95rem;
-            color: #2e7d32;
-            line-height: 1.4;
-            font-weight: bold;
-            min-height: 40px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#fbf3e6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="うんちきろく">
+<title>うんちきろく</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+  /* 片手で上から順にタップして、いちばん下の大きなボタンで送る縦1列のレイアウト */
+  :root {
+    --bg: #fbf3e6;
+    --card: #ffffff;
+    --ink: #4a3426;
+    --muted: #9a8577;
+    --line: #eadccb;
+    --accent: #f0883e;
+    --accent-ink: #ffffff;
+    --soft: #fde8d4;
+    --good: #3f9b6b;
+    --bad: #d2493a;
+    --font: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1d1714;
+      --card: #2a221d;
+      --ink: #f4e9df;
+      --muted: #b09e90;
+      --line: #43362d;
+      --accent: #f39a55;
+      --accent-ink: #1d1714;
+      --soft: #4a3123;
+      --good: #6cc597;
+      --bad: #ff8a7a;
+    }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 500;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(150px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 4px 4px 0; }
+  h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: .04em; }
+  .today { font-size: 13px; color: var(--muted); }
+
+  .card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 16px;
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .q { margin: 0 0 12px; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .q .step {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--soft); color: var(--accent);
+    display: grid; place-items: center; font-size: 13px; font-weight: 900;
+  }
+
+  /* いつ */
+  .when-main { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .when-big { font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .when-big small { font-size: 14px; color: var(--muted); font-weight: 700; margin-left: 6px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .chip {
+    border: 1.5px solid var(--line); background: transparent; color: var(--ink);
+    border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 700;
+    touch-action: manipulation; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--card); }
+  .edit-toggle { border: 0; background: transparent; color: var(--accent); font: inherit; font-weight: 700; font-size: 14px; padding: 6px 0; cursor: pointer; }
+  .edit { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .edit label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .edit input, .edit select {
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 10px; height: 46px; width: 100%; min-width: 0;
+    -webkit-appearance: none; appearance: none;
+  }
+
+  /* 選択ボタン */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .opt {
+    border: 2px solid transparent; background: var(--bg); color: var(--ink);
+    border-radius: 18px; padding: 14px 4px 12px; font: inherit; font-size: 15px; font-weight: 700;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    touch-action: manipulation; cursor: pointer; transition: transform .08s ease;
+  }
+  .opt .ico { font-size: 30px; line-height: 1; }
+  .opt[aria-pressed="true"] { background: var(--soft); border-color: var(--accent); }
+  .opt:active { transform: scale(.96); }
+  .opt:focus-visible, .chip:focus-visible, .send:focus-visible, .edit-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* 最近の記録 */
+  .recent h2 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 700; }
+  .recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .recent li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px dashed var(--line); font-size: 15px; }
+  .recent li:first-child { border-top: 0; }
+  .recent .t { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .recent .v { color: var(--muted); }
+  .recent .empty { color: var(--muted); font-size: 14px; }
+  .note { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+
+  /* 送信バー */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    padding: 12px max(16px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+  }
+  .bar-inner { max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+  .summary { text-align: center; font-size: 14px; color: var(--muted); font-weight: 700; min-height: 1.4em; }
+  .send {
+    width: 100%; border: 0; border-radius: 20px; padding: 18px; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink);
+    font: inherit; font-size: 20px; font-weight: 900; letter-spacing: .06em;
+    box-shadow: 0 6px 18px -8px var(--accent);
+    touch-action: manipulation;
+  }
+  .send:disabled { opacity: .6; cursor: default; }
+  .send.done { background: var(--good); }
+  .send.fail { background: var(--bad); }
+
+  @media (prefers-reduced-motion: reduce) { .opt { transition: none; } }
+</style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <h1>うんちきろく</h1>
+    <span class="today" id="today"></span>
+  </header>
 
-<div class="app-container">
-    <h1>👶 うんちきろく</h1>
-
-    <div class="section-title">📅 いつした？</div>
-    <div class="datetime-area">
-        <div>
-            <label>ひにち</label>
-            <input type="date" id="logDate">
-        </div>
-        <div>
-            <label>じかん</label>
-            <select id="logHour"></select>
-        </div>
+  <section class="card" aria-labelledby="qWhen">
+    <p class="q" id="qWhen"><span class="step">1</span>いつした？</p>
+    <div class="when-main">
+      <div class="when-big" id="whenBig"></div>
+      <button class="edit-toggle" type="button" id="editToggle" aria-expanded="false">日時を変える</button>
     </div>
-
-    <div class="section-title">1. かたさは？</div>
-    <div class="selector-grid" id="hardnessGroup">
-        <div class="option-btn" data-value="かたい">
-            <span class="emoji">🪨</span>かたい
-        </div>
-        <div class="option-btn selected" data-value="ふつう">
-            <span class="emoji">🍌</span>ふつう
-        </div>
-        <div class="option-btn" data-value="やわらかい">
-            <span class="emoji">💧</span>ゆるめ
-        </div>
+    <div class="chips" role="group" aria-label="かんたん選択">
+      <button class="chip" type="button" data-ago="0" aria-pressed="true">いま</button>
+      <button class="chip" type="button" data-ago="1" aria-pressed="false">1時間前</button>
+      <button class="chip" type="button" data-ago="2" aria-pressed="false">2時間前</button>
+      <button class="chip" type="button" data-ago="3" aria-pressed="false">3時間前</button>
     </div>
-
-    <div class="section-title">2. 量は？</div>
-    <div class="selector-grid" id="amountGroup">
-        <div class="option-btn" data-value="すくない">
-            <span class="emoji">✨</span>すくない
-        </div>
-        <div class="option-btn selected" data-value="ふつう">
-            <span class="emoji">👍</span>ふつう
-        </div>
-        <div class="option-btn" data-value="おおい">
-            <span class="emoji">💥</span>おおい
-        </div>
+    <div class="edit" id="edit" hidden>
+      <label for="logDate">ひにち<input type="date" id="logDate"></label>
+      <label for="logHour">じかん<select id="logHour"></select></label>
     </div>
+  </section>
 
-    <button class="submit-btn" id="submitBtn">📝 記録する</button>
-    
-    <div class="message" id="msg"></div>
+  <section class="card" aria-labelledby="qHard">
+    <p class="q" id="qHard"><span class="step">2</span>かたさは？</p>
+    <div class="grid" id="hardnessGroup" role="group" aria-labelledby="qHard">
+      <button class="opt" type="button" data-value="かたい" aria-pressed="false"><span class="ico" aria-hidden="true">🪨</span>かたい</button>
+      <button class="opt" type="button" data-value="ふつう" aria-pressed="true"><span class="ico" aria-hidden="true">🍌</span>ふつう</button>
+      <button class="opt" type="button" data-value="やわらかい" aria-pressed="false"><span class="ico" aria-hidden="true">💧</span>ゆるめ</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="qAmt">
+    <p class="q" id="qAmt"><span class="step">3</span>量は？</p>
+    <div class="grid" id="amountGroup" role="group" aria-labelledby="qAmt">
+      <button class="opt" type="button" data-value="すくない" aria-pressed="false"><span class="ico" aria-hidden="true">🫘</span>すくない</button>
+      <button class="opt" type="button" data-value="ふつう" aria-pressed="true"><span class="ico" aria-hidden="true">👍</span>ふつう</button>
+      <button class="opt" type="button" data-value="おおい" aria-pressed="false"><span class="ico" aria-hidden="true">💥</span>おおい</button>
+    </div>
+  </section>
+
+  <section class="card recent" aria-labelledby="recentTitle">
+    <h2 id="recentTitle">この端末で記録した最近の5件</h2>
+    <ul id="recent"></ul>
+    <p class="note">ほかの端末で記録した分は、スプレッドシートで見てください。</p>
+  </section>
+</div>
+
+<div class="bar">
+  <div class="bar-inner">
+    <div class="summary" id="summary" aria-live="polite"></div>
+    <button class="send" type="button" id="submitBtn">記録する</button>
+  </div>
 </div>
 
 <script>
-    initDateTime();
-    setupSelector('hardnessGroup');
-    setupSelector('amountGroup');
-    document.getElementById('submitBtn').addEventListener('click', saveRecord);
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbx5i0HrAA4teg6AoiHhhACbw6aFaeJ0OvnALXywv7g0rq6owxU4QWWexLeeyhVD7m_O/exec";
+  const LABEL = { "かたい": "かたい", "ふつう": "ふつう", "やわらかい": "ゆるめ", "すくない": "すくない", "おおい": "おおい" };
+  const WD = ["日", "月", "火", "水", "木", "金", "土"];
+  const $ = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2, "0");
+  const store = {
+    get() { try { return JSON.parse(localStorage.getItem("poopLog.recent") || "[]"); } catch (e) { return []; } },
+    set(v) { try { localStorage.setItem("poopLog.recent", JSON.stringify(v.slice(0, 5))); } catch (e) {} }
+  };
 
-    function initDateTime() {
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const dd = String(now.getDate()).padStart(2, '0');
-        document.getElementById('logDate').value = `${yyyy}-${mm}-${dd}`;
-        
-        const hourSelect = document.getElementById('logHour');
-        const currentHour = now.getHours();
-        
-        for (let i = 0; i < 24; i++) {
-            const opt = document.createElement('option');
-            opt.value = i;
-            opt.textContent = `${i}時`;
-            if (i === currentHour) opt.selected = true;
-            hourSelect.appendChild(opt);
+  let sending = false;
+
+  function setWhen(d) {
+    $("logDate").value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    $("logHour").value = String(d.getHours());
+    renderWhen();
+  }
+  function renderWhen() {
+    const [y, m, dd] = $("logDate").value.split("-").map(Number);
+    const d = new Date(y, m - 1, dd);
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const yest = new Date(now); yest.setDate(now.getDate() - 1);
+    const dayLabel = sameDay ? "きょう" : d.toDateString() === yest.toDateString() ? "きのう" : `${m}/${dd}(${WD[d.getDay()]})`;
+    $("whenBig").innerHTML = "";
+    $("whenBig").append(`${$("logHour").value}時ごろ`);
+    const s = document.createElement("small"); s.textContent = dayLabel; $("whenBig").append(s);
+    renderSummary();
+  }
+  function selected(groupId) {
+    const b = document.querySelector(`#${groupId} .opt[aria-pressed="true"]`);
+    return b ? b.dataset.value : "ふつう";
+  }
+  function renderSummary() {
+    $("summary").textContent = `${$("whenBig").textContent.replace("ごろ", "ごろ・")}／${LABEL[selected("hardnessGroup")]}／${LABEL[selected("amountGroup")]}`;
+  }
+  function renderRecent() {
+    const list = store.get();
+    const ul = $("recent"); ul.innerHTML = "";
+    if (!list.length) { const li = document.createElement("li"); li.className = "empty"; li.textContent = "まだ記録がありません"; ul.append(li); return; }
+    for (const r of list) {
+      const li = document.createElement("li");
+      const t = document.createElement("span"); t.className = "t"; t.textContent = r.time.slice(5).replace("-", "/");
+      const v = document.createElement("span"); v.className = "v"; v.textContent = `${LABEL[r.hardness] || r.hardness}・${LABEL[r.amount] || r.amount}`;
+      li.append(t, v); ul.append(li);
+    }
+  }
+
+  function init() {
+    const now = new Date();
+    $("today").textContent = `${now.getMonth() + 1}月${now.getDate()}日(${WD[now.getDay()]})`;
+    for (let i = 0; i < 24; i++) { const o = document.createElement("option"); o.value = String(i); o.textContent = `${i}時`; $("logHour").append(o); }
+    setWhen(now);
+
+    document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+      document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", "false"));
+      c.setAttribute("aria-pressed", "true");
+      const d = new Date(); d.setHours(d.getHours() - Number(c.dataset.ago)); setWhen(d);
+    }));
+    $("editToggle").addEventListener("click", () => {
+      const open = $("edit").hidden; $("edit").hidden = !open;
+      $("editToggle").setAttribute("aria-expanded", open ? "true" : "false");
+      $("editToggle").textContent = open ? "とじる" : "日時を変える";
+    });
+    ["logDate", "logHour"].forEach(id => $(id).addEventListener("change", () => {
+      document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", "false"));
+      renderWhen();
+    }));
+    ["hardnessGroup", "amountGroup"].forEach(g => {
+      document.querySelectorAll(`#${g} .opt`).forEach(b => b.addEventListener("click", () => {
+        document.querySelectorAll(`#${g} .opt`).forEach(x => x.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+        renderSummary();
+      }));
+    });
+    $("submitBtn").addEventListener("click", saveRecord);
+    renderRecent();
+  }
+
+  function resetButton(btn, delay) {
+    setTimeout(() => { btn.classList.remove("done", "fail"); btn.textContent = "記録する"; btn.disabled = false; sending = false; }, delay);
+  }
+
+  function saveRecord() {
+    if (sending) return;
+    sending = true;
+    const btn = $("submitBtn");
+    const data = { time: `${$("logDate").value} ${$("logHour").value}:00`, hardness: selected("hardnessGroup"), amount: selected("amountGroup") };
+    btn.disabled = true; btn.textContent = "送信中…";
+    fetch(GAS_URL, { method: "POST", body: JSON.stringify(data), headers: { "Content-Type": "text/plain" } })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") {
+          store.set([data, ...store.get()]); renderRecent();
+          btn.classList.add("done"); btn.textContent = "記録しました！おつかれさま";
+          resetButton(btn, 2200);
+        } else {
+          btn.classList.add("fail"); btn.textContent = "記録できませんでした。もう一度押してね";
+          resetButton(btn, 3000);
         }
-    }
+      })
+      .catch(() => {
+        btn.classList.add("fail"); btn.textContent = "電波を確認して、もう一度押してね";
+        resetButton(btn, 3000);
+      });
+  }
 
-    function setupSelector(groupId) {
-        const container = document.getElementById(groupId);
-        const buttons = container.getElementsByClassName('option-btn');
-        
-        for (let btn of buttons) {
-            const eventType = window.ontouchstart !== undefined ? 'touchstart' : 'click';
-            
-            btn.addEventListener(eventType, function(e) {
-                e.preventDefault();
-                for (let b of buttons) b.classList.remove('selected');
-                this.classList.add('selected');
-            });
-        }
-    }
-
-    function saveRecord() {
-        const selectedDate = document.getElementById('logDate').value;
-        const selectedHour = document.getElementById('logHour').value;
-        const timeStr = `${selectedDate} ${selectedHour}:00`;
-
-        const hardness = document.querySelector('#hardnessGroup .option-btn.selected').getAttribute('data-value');
-        const amount = document.querySelector('#amountGroup .option-btn.selected').getAttribute('data-value');
-
-        const gasUrl = "https://script.google.com/macros/s/AKfycbx5i0HrAA4teg6AoiHhhACbw6aFaeJ0OvnALXywv7g0rq6owxU4QWWexLeeyhVD7m_O/exec";
-
-        const data = { time: timeStr, hardness: hardness, amount: amount };
-
-        document.getElementById('msg').innerText = "送信中...";
-
-        fetch(gasUrl, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "text/plain" }
-        })
-        .then(response => response.json())
-        .then(result => {
-            if(result.status === "success") {
-                document.getElementById('msg').innerHTML = "いつもお疲れさまです！<br>記録ありがとうございます(*^-^*)";
-            } else {
-                document.getElementById('msg').innerText = "エラーが発生しました";
-            }
-        })
-        .catch(error => {
-            document.getElementById('msg').innerText = "通信エラーが発生しました";
-            console.error(error);
-        });
-    }
+  init();
 </script>
-
 </body>
 </html>
